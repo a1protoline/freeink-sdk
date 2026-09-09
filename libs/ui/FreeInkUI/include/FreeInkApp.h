@@ -785,6 +785,15 @@ public:
   RefreshHint refreshHint() const { return refreshHint_; }
   RefreshHint lastRenderRefreshHint() const { return lastRenderHint_; }
   bool interactionOverflowed() const { return interactions_.overflowed(); }
+  // Forwards InteractionBuffer's own already-public focusedIndex() (see
+  // FreeInkUICore.h) so a host app can detect "did a bare focus move (no
+  // dispatched action) change the focused element this call" and invalidate
+  // for a repaint itself -- render() only calls invalidate() when finish()
+  // returns a truthy ActionEvent, which a plain focusNext/focusPrev never
+  // produces (moveFocus() returns the default-constructed, falsy `event`).
+  // A pure read-only forwarding getter, matching interactionOverflowed()'s
+  // own pattern immediately above -- no stored/dispatched behavior changes.
+  int16_t focusedIndex() const { return interactions_.focusedIndex(); }
   bool handlerOverflowed() const { return handlerOverflowed_; }
   ActionEvent lastEvent() const { return lastEvent_; }
 
