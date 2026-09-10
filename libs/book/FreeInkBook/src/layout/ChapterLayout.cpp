@@ -536,21 +536,25 @@ CssDecl elementDefaults(const char* local) {
     d.weightBold = 1;
     d.marginTopPct = 100;
     d.marginBottomPct = 50;
+    d.align = TextAlign::Left;
   } else if (strcmp(local, "h2") == 0) {
     d.sizePct = 160;
     d.weightBold = 1;
     d.marginTopPct = 90;
     d.marginBottomPct = 45;
+    d.align = TextAlign::Left;
   } else if (strcmp(local, "h3") == 0) {
     d.sizePct = 130;
     d.weightBold = 1;
     d.marginTopPct = 80;
     d.marginBottomPct = 40;
+    d.align = TextAlign::Left;
   } else if (strcmp(local, "h4") == 0 || strcmp(local, "h5") == 0 || strcmp(local, "h6") == 0) {
     d.sizePct = 115;
     d.weightBold = 1;
     d.marginTopPct = 70;
     d.marginBottomPct = 35;
+    d.align = TextAlign::Left;
   } else if (strcmp(local, "blockquote") == 0) {
     d.styleItalic = 1;
     d.marginTopPct = 40;
