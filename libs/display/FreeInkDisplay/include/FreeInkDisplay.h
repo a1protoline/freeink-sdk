@@ -70,7 +70,14 @@ class FreeInkDisplay {
   // periodic-full cadence (currently the EEGO A4's UC8279C driver).
   void setHoldPeriodicFullRefresh(bool hold);
 
-  void begin();
+  // preserveController=true resumes after an ESP32 deep sleep WITHOUT resetting the panel
+  // controller, so its RAM (the fast-refresh baseline) and registers survive and the first
+  // FAST refresh is not promoted to a full one. Only valid when ALL hold: the controller
+  // stayed powered and un-reset through the sleep, and the last refresh before sleep was a
+  // blocking one (leaving the old-frame plane equal to the shown image). The caller owns
+  // that guarantee; any doubt -> begin(false). Drivers that cannot resume fall back to a
+  // normal begin().
+  void begin(bool preserveController = false);
 
   // Legacy compile-time dimensions kept for compatibility.
   static constexpr uint16_t DISPLAY_WIDTH = 800;

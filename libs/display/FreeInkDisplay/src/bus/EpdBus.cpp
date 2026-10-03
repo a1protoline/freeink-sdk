@@ -67,7 +67,8 @@ static void IRAM_ATTR epdBusyIsr() {
   if (woken) portYIELD_FROM_ISR();
 }
 
-void EpdBus::begin(const EpdPins& pins, uint32_t spiHz, BusyPolarity busy, int8_t spiMiso, int8_t coCs) {
+void EpdBus::begin(const EpdPins& pins, uint32_t spiHz, BusyPolarity busy, int8_t spiMiso, int8_t coCs,
+                   bool preserveController) {
   _pins = pins;
   _spiHz = spiHz;
   _busy = busy;
@@ -102,8 +103,16 @@ void EpdBus::begin(const EpdPins& pins, uint32_t spiHz, BusyPolarity busy, int8_
   // bounce off the latch. Boards routing RST through an IO expander leave the
   // pin unassigned and reset via the freeink_board_epd_reset hook instead.
   if (pins.rst >= 0) {
+    // preserveController: the controller kept running through ESP32 deep sleep and
+    // its RAM must survive, so RST must never go low. The pad's output latch is
+    // cleared by the wake reset, and pinMode(OUTPUT) would otherwise drive that
+    // stale LOW the instant the output is enabled -- a reset pulse. Latch HIGH
+    // first (it is ignored while the pad is held), then release the hold, then
+    // enable the output.
+    if (preserveController) digitalWrite(pins.rst, HIGH);
     gpio_hold_dis(static_cast<gpio_num_t>(pins.rst));
     pinMode(pins.rst, OUTPUT);
+    if (preserveController) digitalWrite(pins.rst, HIGH);
   }
   pinMode(pins.busy, busy == BusyPolarity::ActiveLow ? INPUT_PULLUP : INPUT);
   if (_coCs >= 0) {

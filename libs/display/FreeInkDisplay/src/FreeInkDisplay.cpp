@@ -187,7 +187,7 @@ void FreeInkDisplay::selectDriver() {
   if (_driver) _driver->setBackgroundHint(_inverted);
 }
 
-void FreeInkDisplay::begin() {
+void FreeInkDisplay::begin(bool preserveController) {
   selectDriver();
 
   // External-library drivers (e.g. M5GFX) own the SPI/display hardware; only
@@ -200,7 +200,7 @@ void FreeInkDisplay::begin() {
     // here; a consumer no longer needs to know the panel's wiring.
     const auto& d = BoardConfig::ACTIVE.display;
     const EpdPins pins{d.sclk, d.mosi, d.cs, d.dc, d.rst, d.busy, d.powerEnable};
-    _bus.begin(pins, _driver->spiHz(), _driver->busyPolarity(), _driver->spiMiso(), _driver->coCs());
+    _bus.begin(pins, _driver->spiHz(), _driver->busyPolarity(), _driver->spiMiso(), _driver->coCs(), preserveController);
   }
 
   const PanelGeometry geom = _driver->geometry();
@@ -226,7 +226,7 @@ void FreeInkDisplay::begin() {
   if (frameBuffer1) memset(frameBuffer1, 0xFF, bufferSize);
 #endif
 
-  _driver->begin(_bus);
+  if (!(preserveController && _driver->resumeFromSleep(_bus))) _driver->begin(_bus);
 }
 
 // ============================================================================

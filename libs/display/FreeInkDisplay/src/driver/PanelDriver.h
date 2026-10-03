@@ -46,6 +46,11 @@ class PanelDriver {
 
   // --- lifecycle ---
   virtual void begin(EpdBus& bus) = 0;
+  // Resume after an ESP32 deep sleep during which the panel controller stayed powered and
+  // un-reset: set up host-side driver state only (no reset, no controller init, no RAM
+  // clear, no forced initial full refresh). Returns false when the driver cannot do this
+  // safely; the caller then falls back to begin(). Default: unsupported.
+  virtual bool resumeFromSleep(EpdBus& bus) { (void)bus; return false; }
   virtual void deepSleep(EpdBus& bus) = 0;
 
   // --- core paint path (load RAM + refresh) ---

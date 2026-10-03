@@ -173,6 +173,19 @@ void Ssd1677Driver::begin(EpdBus& bus) {
   initController(bus);
 }
 
+// Resume without touching the controller: begin() would pulse RST, send SOFT_RESET and
+// auto-write both RAM planes, destroying the differential (RED) baseline and forcing
+// the absolute first-paint refresh. After a deep sleep with the panel rail on, the
+// controller still holds its registers and RAM (hardware-verified on ws397), so only
+// the host-side flags are re-armed: analog/clock are off (every refresh sequence
+// powers them down) and the first paint need not be a full refresh. The caller must
+// guarantee the RED plane matches the physically shown image (see FreeInkDisplay::begin).
+bool Ssd1677Driver::resumeFromSleep(EpdBus&) {
+  _isScreenOn = false;
+  _needsInitialFull = false;
+  return true;
+}
+
 void Ssd1677Driver::initController(EpdBus& bus) {
   constexpr uint8_t TEMP_SENSOR_INTERNAL = 0x80;
 

@@ -69,6 +69,7 @@ class Ssd1677Driver : public PanelDriver {
   PanelGeometry geometry() const override;
 
   void begin(EpdBus& bus) override;
+  bool resumeFromSleep(EpdBus& bus) override;
   void deepSleep(EpdBus& bus) override;
 
   void display(EpdBus& bus, const uint8_t* fb, const uint8_t* prev, RefreshMode mode, bool turnOff) override;
